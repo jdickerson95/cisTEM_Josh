@@ -106,6 +106,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
     bool     set_expert_options        = false;
+    int      gpu_id                    = -1;
 
     UserInput* my_input = new UserInput("MatchTemplate", 1.00);
 
@@ -147,10 +148,13 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
 
-    //set_expert_options = my_input->GetYesNoFromUser("Set Expert Options?", "Set these for more control, hopefully not needed", "No");
-    //if ( set_expert_options == true ) {
+    set_expert_options = my_input->GetYesNoFromUser("Set Expert Options?", "Set these for more control, hopefully not needed", "No");
+    if ( set_expert_options == true ) {
         // Add in the expert options here. 1) GPU_ID 2) Restricted angles
-    //}
+        #ifdef ENABLEGPU
+            gpu_id = = my_input->GetIntFromUser("GPU ID", "ID of the GPU you would like to use. -1 is autoselect based on free memory", "-1", -1);
+        #endif
+    }
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -657,7 +661,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 #ifdef ENABLEGPU
         //    checkCudaErrors(cudaGetDeviceCount(&nGPUs));
         GPU = new TemplateMatchingCore[max_threads];
-        gpuDev.Init(nGPUs);
+        gpuDev.Init(nGPUs, gpu_id);
 
 //    wxPrintf("Host: %s is running\nnThreads: %d\nnGPUs: %d\n:nSearchPos %d \n",hostNameBuffer,nThreads, nGPUs, maxPos);
 

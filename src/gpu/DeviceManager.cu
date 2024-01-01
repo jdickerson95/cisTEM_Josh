@@ -5,9 +5,9 @@ DeviceManager::DeviceManager( ){
 
 };
 
-DeviceManager::DeviceManager(int wanted_number_of_gpus) {
+DeviceManager::DeviceManager(int wanted_number_of_gpus, int wanted_gpu_id) {
 
-    Init(wanted_number_of_gpus);
+    Init(wanted_number_of_gpus, wanted_gpu_id);
 };
 
 DeviceManager::~DeviceManager( ) {
@@ -16,7 +16,7 @@ DeviceManager::~DeviceManager( ) {
     }
 };
 
-void DeviceManager::Init(int wanted_number_of_gpus) {
+void DeviceManager::Init(int wanted_number_of_gpus, int wanted_gpu_id) {
     wxPrintf("requesting %d gpus\n", wanted_number_of_gpus);
 
     int gpu_check = -1;
@@ -49,6 +49,7 @@ void DeviceManager::Init(int wanted_number_of_gpus) {
 
     //  // sleep for a short random bit between 0.5 and 5 seconds. The goal is so mutli-card units have work sent to the next card.
     //  wxMilliSleep((global_random_number_generator.GetUniformRandom() + 1.5) * 2000);
+    if (wanted_gpu_id >= 0) {
     for ( int iGPU = 0; iGPU < gpu_check; iGPU++ ) {
         cudaDeviceProp prop;
         cudaErr(cudaGetDeviceProperties(&prop, iGPU));
@@ -102,8 +103,11 @@ void DeviceManager::Init(int wanted_number_of_gpus) {
     }
 
     MyAssertTrue(selected_GPU >= 0, "No suitable GPU found. Terminating...");
-
     wxPrintf("Found a max mem of %zd bytes on gpuIDX %d\n", max_mem, selected_GPU);
+    }
+    else{
+        selected_GPU = wanted_gpu_id;
+    }
     this->nGPUs  = wanted_number_of_gpus;
     this->gpuIDX = selected_GPU;
 
