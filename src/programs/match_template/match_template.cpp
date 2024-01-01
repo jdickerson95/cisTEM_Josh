@@ -167,7 +167,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbii", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -208,7 +208,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads);
+                                      max_threads,
+                                      gpu_id);
 }
 
 // override the do calculation method which will be what is actually run..
@@ -266,6 +267,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    int      gpu_id                          = my_current_job.arguments[42].ReturnIntegerArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
