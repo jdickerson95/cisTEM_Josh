@@ -105,6 +105,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
+    bool     set_expert_options        = false;
 
     UserInput* my_input = new UserInput("MatchTemplate", 1.00);
 
@@ -145,6 +146,11 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
+
+    //set_expert_options = my_input->GetYesNoFromUser("Set Expert Options?", "Set these for more control, hopefully not needed", "No");
+    //if ( set_expert_options == true ) {
+        // Add in the expert options here. 1) GPU_ID 2) Restricted angles
+    //}
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
