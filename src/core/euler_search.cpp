@@ -120,13 +120,15 @@ void EulerSearch::Init(float wanted_resolution_limit, ParameterMap& wanted_param
     //Allocate2DFloatArray(list_of_best_parameters, best_parameters_to_keep + 1, 6);
 }
 
-void EulerSearch::InitGrid(wxString wanted_symmetry_symbol, float wanted_angular_step_size, float wanted_phi_start, float wanted_theta_start, float wanted_psi_max, float wanted_psi_step, float wanted_psi_start, float wanted_resolution_limit, ParameterMap& wanted_parameter_map, int wanted_parameters_to_keep) {
+void EulerSearch::InitGrid(wxString wanted_symmetry_symbol, float wanted_angular_step_size, float wanted_phi_start, float wanted_phi_end, float wanted_theta_start, float wanted_theta_end,float wanted_psi_max, float wanted_psi_step, float wanted_psi_start, float wanted_resolution_limit, ParameterMap& wanted_parameter_map, int wanted_parameters_to_keep) {
     if ( number_of_search_positions == 0 )
         Init(wanted_resolution_limit, wanted_parameter_map, wanted_parameters_to_keep);
 
     angular_step_size = wanted_angular_step_size;
     phi_start         = wanted_phi_start;
+    phi_max           = wanted_phi_end;
     theta_start       = wanted_theta_start;
+    theta_max         = wanted_theta_end;
     psi_max           = wanted_psi_max;
     psi_step          = wanted_psi_step;
     psi_start         = wanted_psi_start;
@@ -358,8 +360,10 @@ void EulerSearch::SetSymmetryLimits( ) {
             DEBUG_ABORT;
         }
 
-        phi_max     = 360.0 / symmetry_number;
-        theta_max   = 90.0;
+        //phi_max     = 360.0 / symmetry_number;
+        //theta_max   = 90.0;
+        phi_max     = phi_max;
+        theta_max   = theta_max;
         test_mirror = true;
 
         return;

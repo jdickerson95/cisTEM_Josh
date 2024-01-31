@@ -107,7 +107,14 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     int      max_threads               = 1; // Only used for the GPU code
     bool     set_expert_options        = false;
     int      gpu_id                    = -1;
-
+    
+    float in_plane_angular_step_start = 0.0f;
+    float in_plane_angular_step_end = 0.0f;
+    float phi_start = 0.0f;
+    float phi_max = 0.0f;
+    float theta_start = 0.0f;
+    float theta_max = 0.0f;
+    
     UserInput* my_input = new UserInput("MatchTemplate", 1.00);
 
     input_search_images         = my_input->GetFilenameFromUser("Input images to be searched", "The input image stack, containing the images that should be searched", "image_stack.mrc", true);
@@ -154,6 +161,12 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
         #ifdef ENABLEGPU
             gpu_id = = my_input->GetIntFromUser("GPU ID", "ID of the GPU you would like to use. -1 is autoselect based on free memory", "-1", -1);
         #endif
+        in_plane_angular_step_start = my_input->GetFloatFromUser("In plane rotation start angle", "Factor determining start angle for in plane rotation search.", "0.0", 0.0);
+        in_plane_angular_step_end = my_input->GetFloatFromUser("In plane rotation end angle", "Factor determining end angle for in plane rotation search.", "360.0", 360.0);
+        phi_start = my_input->GetFloatFromUser("Phi start angle", "Factor determining start angle for the phi search.", "0.0", 0.0);
+        phi_max = my_input->GetFloatFromUser("Phi end angle", "Factor determining end angle for the phi search.", "360.0", 360.0);
+        theta_start = my_input->GetFloatFromUser("Theta start angle", "Factor determining start angle for the theta search.", "0.0", 0.0);
+        theta_max = my_input->GetFloatFromUser("Theta end angle", "Factor determining end angle for the theta search.", "360.0", 360.0);
     }
 
     int   first_search_position           = -1;
@@ -167,7 +180,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbii", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbiiffffff", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -209,7 +222,13 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       min_peak_radius,
                                       use_gpu_input,
                                       max_threads,
-                                      gpu_id);
+                                      gpu_id,
+                                      in_plane_angular_step_start,
+                                      in_plane_angular_step_end,
+                                      phi_start,
+                                      phi_max,
+                                      theta_start,
+                                      theta_max);
 }
 
 // override the do calculation method which will be what is actually run..
@@ -268,6 +287,12 @@ bool MatchTemplateApp::DoCalculation( ) {
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
     int      gpu_id                          = my_current_job.arguments[42].ReturnIntegerArgument( );
+    float    in_plane_angular_step_start     = my_current_job.arguments[43].ReturnIntegerArgument( );
+    float    in_plane_angular_step_end       = my_current_job.arguments[44].ReturnIntegerArgument( );
+    float    phi_start                       = my_current_job.arguments[45].ReturnIntegerArgument( );
+    float    phi_max                         = my_current_job.arguments[46].ReturnIntegerArgument( );
+    float    theta_start                     = my_current_job.arguments[47].ReturnIntegerArgument( );
+    float    theta_max                       = my_current_job.arguments[48].ReturnIntegerArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -528,8 +553,10 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
 
     //psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
-    psi_start = 0.0f;
-    psi_max   = 360.0f;
+    //psi_start = 0.0f;
+    //psi_max   = 360.0f;
+    psi_start = in_plane_angular_step_start;
+    psi_end = in_plane_angular_step_end;
 
     //psi_step = 5;
 
@@ -537,12 +564,14 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     // search grid
 
-    global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
+    //global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
+    global_euler_search.InitGrid(my_symmetry, angular_step, phi_start, phi_max, theta_start, theta_max, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
     if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
     {
         if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
         {
-            global_euler_search.theta_max = 180.0f;
+            //global_euler_search.theta_max = 180.0f;
+            global_euler_search.theta_max = theta_max;
         }
     }
 
