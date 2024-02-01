@@ -9,10 +9,10 @@ class DeviceManager {
     bool is_manager_initialized = false;
 
     DeviceManager( );
-    DeviceManager(int wanted_number_of_gpus);
+    DeviceManager(int wanted_number_of_gpus, int wanted_gpu_id);
     virtual ~DeviceManager( );
 
-    void Init(int wanted_number_of_gpus);
+    void Init(int wanted_number_of_gpus, int wanted_gpu_id);
     void SetGpu(int cpu_thread_idx);
     void ResetGpu( );
     void ListDevices( );

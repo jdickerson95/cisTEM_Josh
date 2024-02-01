@@ -152,7 +152,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     if ( set_expert_options == true ) {
         // Add in the expert options here. 1) GPU_ID 2) Restricted angles
         #ifdef ENABLEGPU
-            gpu_id = = my_input->GetIntFromUser("GPU ID", "ID of the GPU you would like to use. -1 is autoselect based on free memory", "-1", -1);
+            gpu_id = my_input->GetIntFromUser("GPU ID", "ID of the GPU you would like to use. -1 is autoselect based on free memory", "-1", -1);
         #endif
     }
 
