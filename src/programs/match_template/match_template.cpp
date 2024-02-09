@@ -315,6 +315,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float psi_step;
     float psi_max;
     float psi_start;
+    float psi_end;
     float histogram_step;
 
     float expected_threshold;
