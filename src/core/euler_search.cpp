@@ -147,6 +147,31 @@ void EulerSearch::InitGrid(wxString wanted_symmetry_symbol, float wanted_angular
     Allocate2DFloatArray(list_of_best_parameters, best_parameters_to_keep + 1, 6);
 }
 
+void EulerSearch::InitGrid(wxString wanted_symmetry_symbol, float wanted_angular_step_size, float wanted_phi_start, float wanted_theta_start, float wanted_psi_max, float wanted_psi_step, float wanted_psi_start, float wanted_resolution_limit, ParameterMap& wanted_parameter_map, int wanted_parameters_to_keep) {
+    if ( number_of_search_positions == 0 )
+        Init(wanted_resolution_limit, wanted_parameter_map, wanted_parameters_to_keep);
+
+    angular_step_size = wanted_angular_step_size;
+    phi_start         = wanted_phi_start;
+    theta_start       = wanted_theta_start;
+    psi_max           = wanted_psi_max;
+    psi_step          = wanted_psi_step;
+    psi_start         = wanted_psi_start;
+    symmetry_symbol   = wanted_symmetry_symbol;
+
+    SetSymmetryLimits( );
+    CalculateGridSearchPositions( );
+
+    if ( list_of_best_parameters != NULL )
+        Deallocate2DFloatArray(list_of_best_parameters, best_parameters_to_keep + 1);
+
+    if ( number_of_search_positions < best_parameters_to_keep ) {
+        best_parameters_to_keep = number_of_search_positions;
+    }
+
+    Allocate2DFloatArray(list_of_best_parameters, best_parameters_to_keep + 1, 6);
+}
+
 // This method has not been tested
 void EulerSearch::InitRandom(wxString wanted_symmetry_symbol, float wanted_psi_step, int wanted_number_of_search_positions, float wanted_resolution_limit, ParameterMap& wanted_parameter_map, int wanted_parameters_to_keep) {
     int i;
