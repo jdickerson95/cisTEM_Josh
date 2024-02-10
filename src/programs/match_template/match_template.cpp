@@ -557,7 +557,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //psi_start = 0.0f;
     //psi_max   = 360.0f;
     psi_start = in_plane_angular_step_start;
-    psi_end = in_plane_angular_step_end;
+    psi_max = in_plane_angular_step_end;
 
     //psi_step = 5;
 
