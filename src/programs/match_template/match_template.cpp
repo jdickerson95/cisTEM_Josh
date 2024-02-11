@@ -162,15 +162,15 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
             gpu_id = my_input->GetIntFromUser("GPU ID", "ID of the GPU you would like to use. -1 is autoselect based on free memory", "-1", -1);
         #endif
         in_plane_angular_step_start = my_input->GetFloatFromUser("In plane rotation start angle", "Factor determining start angle for in plane rotation search.", "0.0", 0.0);
-        in_plane_angular_step_end = my_input->GetFloatFromUser("In plane rotation end angle", "Factor determining end angle for in plane rotation search.", "360.0", 360.0);
+        in_plane_angular_step_end = my_input->GetFloatFromUser("In plane rotation end angle", "Factor determining end angle for in plane rotation search.", "360.0", 0.0);
         phi_start = my_input->GetFloatFromUser("Phi start angle", "Factor determining start angle for the phi search.", "0.0", 0.0);
-        phi_max = my_input->GetFloatFromUser("Phi end angle", "Factor determining end angle for the phi search.", "360.0", 360.0);
+        phi_max = my_input->GetFloatFromUser("Phi end angle", "Factor determining end angle for the phi search.", "360.0", 0.0);
         theta_start = my_input->GetFloatFromUser("Theta start angle", "Factor determining start angle for the theta search.", "0.0", 0.0);
-        theta_max = my_input->GetFloatFromUser("Theta end angle", "Factor determining end angle for the theta search.", "360.0", 360.0);
+        theta_max = my_input->GetFloatFromUser("Theta end angle", "Factor determining end angle for the theta search.", "360.0", 0.0);
     }
 
     int   first_search_position           = -1;
-    int   last_search_position            = -1;
+    int   last_search_position            = -
     int   image_number_for_gui            = 0;
     int   number_of_jobs_per_image_in_gui = 0;
     float min_peak_radius                 = 10.0f;
