@@ -170,7 +170,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     }
 
     int   first_search_position           = -1;
-    int   last_search_position            = -
+    int   last_search_position            = -1;
     int   image_number_for_gui            = 0;
     int   number_of_jobs_per_image_in_gui = 0;
     float min_peak_radius                 = 10.0f;
