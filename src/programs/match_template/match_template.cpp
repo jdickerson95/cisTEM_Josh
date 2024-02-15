@@ -133,8 +133,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     voltage_kV                  = my_input->GetFloatFromUser("Beam energy (keV)", "The energy of the electron beam used to image the sample in kilo electron volts", "300.0", 0.0);
     spherical_aberration_mm     = my_input->GetFloatFromUser("Spherical aberration (mm)", "Spherical aberration of the objective lens in millimeters", "2.7");
     amplitude_contrast          = my_input->GetFloatFromUser("Amplitude contrast", "Assumed amplitude contrast", "0.07", 0.0, 1.0);
-    defocus1                    = my_input->GetFloatFromUser("Defocus1 (angstroms)", "Defocus1 for the input image", "10000", 0.0);
-    defocus2                    = my_input->GetFloatFromUser("Defocus2 (angstroms)", "Defocus2 for the input image", "10000", 0.0);
+    defocus1                    = my_input->GetFloatFromUser("Defocus1 (angstroms)", "Defocus1 for the input image", "10000", -20000.0);
+    defocus2                    = my_input->GetFloatFromUser("Defocus2 (angstroms)", "Defocus2 for the input image", "10000", -20000.0);
     defocus_angle               = my_input->GetFloatFromUser("Defocus Angle (degrees)", "Defocus Angle for the input image", "0.0");
     phase_shift                 = my_input->GetFloatFromUser("Phase Shift (degrees)", "Additional phase shift in degrees", "0.0");
     //    low_resolution_limit = my_input->GetFloatFromUser("Low resolution limit (A)", "Low resolution limit of the data used for alignment in Angstroms", "300.0", 0.0);
@@ -161,12 +161,12 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
         #ifdef ENABLEGPU
             gpu_id = my_input->GetIntFromUser("GPU ID", "ID of the GPU you would like to use. -1 is autoselect based on free memory", "-1", -1);
         #endif
-        in_plane_angular_step_start = my_input->GetFloatFromUser("In plane rotation start angle", "Factor determining start angle for in plane rotation search.", "0.0", 0.0);
-        in_plane_angular_step_end = my_input->GetFloatFromUser("In plane rotation end angle", "Factor determining end angle for in plane rotation search.", "360.0", 0.0);
-        phi_start = my_input->GetFloatFromUser("Phi start angle", "Factor determining start angle for the phi search.", "0.0", 0.0);
-        phi_max = my_input->GetFloatFromUser("Phi end angle", "Factor determining end angle for the phi search.", "360.0", 0.0);
-        theta_start = my_input->GetFloatFromUser("Theta start angle", "Factor determining start angle for the theta search.", "0.0", 0.0);
-        theta_max = my_input->GetFloatFromUser("Theta end angle", "Factor determining end angle for the theta search.", "360.0", 0.0);
+        in_plane_angular_step_start = my_input->GetFloatFromUser("In plane rotation start angle", "Factor determining start angle for in plane rotation search.", "0.0", -180.0);
+        in_plane_angular_step_end = my_input->GetFloatFromUser("In plane rotation end angle", "Factor determining end angle for in plane rotation search.", "360.0", -180.0);
+        phi_start = my_input->GetFloatFromUser("Phi start angle", "Factor determining start angle for the phi search.", "0.0", -180.0);
+        phi_max = my_input->GetFloatFromUser("Phi end angle", "Factor determining end angle for the phi search.", "360.0", -180.0);
+        theta_start = my_input->GetFloatFromUser("Theta start angle", "Factor determining start angle for the theta search.", "0.0", -180.0);
+        theta_max = my_input->GetFloatFromUser("Theta end angle", "Factor determining end angle for the theta search.", "360.0", -180.0);
     }
 
     int   first_search_position           = -1;
@@ -287,12 +287,12 @@ bool MatchTemplateApp::DoCalculation( ) {
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
     int      gpu_id                          = my_current_job.arguments[42].ReturnIntegerArgument( );
-    float    in_plane_angular_step_start     = my_current_job.arguments[43].ReturnIntegerArgument( );
-    float    in_plane_angular_step_end       = my_current_job.arguments[44].ReturnIntegerArgument( );
-    float    phi_start                       = my_current_job.arguments[45].ReturnIntegerArgument( );
-    float    phi_max                         = my_current_job.arguments[46].ReturnIntegerArgument( );
-    float    theta_start                     = my_current_job.arguments[47].ReturnIntegerArgument( );
-    float    theta_max                       = my_current_job.arguments[48].ReturnIntegerArgument( );
+    float    in_plane_angular_step_start     = my_current_job.arguments[43].ReturnFloatArgument( );
+    float    in_plane_angular_step_end       = my_current_job.arguments[44].ReturnFloatArgument( );
+    float    phi_start                       = my_current_job.arguments[45].ReturnFloatArgument( );
+    float    phi_max                         = my_current_job.arguments[46].ReturnFloatArgument( );
+    float    theta_start                     = my_current_job.arguments[47].ReturnFloatArgument( );
+    float    theta_max                       = my_current_job.arguments[48].ReturnFloatArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -558,7 +558,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //psi_max   = 360.0f;
     psi_start = in_plane_angular_step_start;
     psi_max = in_plane_angular_step_end;
-
+    wxPrintf("Set the psi max, about to init euler grid\n");
     //psi_step = 5;
 
     //wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
@@ -567,6 +567,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     //global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
     global_euler_search.InitGrid(my_symmetry, angular_step, phi_start, phi_max, theta_start, theta_max, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
+    wxPrintf("Euler grid init done and now back to match template .cpp\n");
     if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
     {
         if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
